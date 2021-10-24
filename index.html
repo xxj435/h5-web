@@ -31,15 +31,6 @@
 		-moz-transition: all .3s;
 		transition: all .3s;
 	}
-
-	/* #hit {
-        padding: 10px;
-        } */
-
-	/* #log {
-        position: absolute;
-        padding: 10px;
-        } */
 </style>
 
 <body>
@@ -53,9 +44,10 @@
 				<textarea></textarea>
 			</div>
 		</div>
-		<!-- <div class="int-img" id='imgInt'> -->
-		<img id='showImg' src="./style/img/1.png" alt="">
-		<!-- </div> -->
+		<div class="int-img" id='imgInt'>
+			<!-- 一开始的定位 -->
+			<img id='showImg' src="" alt="" style="position: absolute;left: 0px; top: -260px;">
+		</div>
 		<div class="intfooter" id="intfooter">
 			<div class="intfooter-b">
 				<label class="intfooter-b-mid intcolorleft" id='fileButton' for="takepicture">拍照</label>
@@ -74,27 +66,18 @@
 </body>
 
 </html>
-<!-- <script src="./js/require.js"></script> -->
-<!-- <script src="./js/main.js"></script> -->
 <script src="./js/jquery.min.js"></script>
 <script src="./js/canvas-toBlob.js"></script>
 <script src="./js/hammer.min.js"></script>
 
 <script>
-	// var myCrop;
-	// require.config({
-	// 	urlArgs: "bust=" + new Date
-	// })
-
 	var reqAnimationFrame = (function () {
 		return window[Hammer.prefixed(window, 'requestAnimationFrame')] || function (callback) {
 			window.setTimeout(callback, 1000 / 60);
 		};
 	})();
 
-	var log = document.querySelector("#log");
 	var el = document.querySelector("#showImg");
-	console.log(el);
 	var START_X = Math.round((window.innerWidth - el.offsetWidth) / 2);
 	var START_Y = Math.round((window.innerHeight - el.offsetHeight) / 2);
 	console.log(START_X, START_Y)
@@ -213,9 +196,6 @@
 		}
 	}
 
-	function logEvent(str) {
-		log.insertBefore(document.createTextNode(str + "\n"), log.firstChild);
-	}
 
 	/**
 	初始化设置
@@ -241,120 +221,74 @@
 	resetElement();
 
 
-	// require(["jquery", 'hammer', 'tomPlugin', "tomLib", 'hammer.fake', 'hammer.showtouch', 'scale'], function ($, hammer,
-	// 	plugin, T) {
-
-
-	// var _x_start, _y_start, _x_move, _y_move, _x_end, _y_end, left_start, top_start;
-	// document.addEventListener("touchstart", function (e) {
-	// 	var touches = e.touches;
-	// 	_x_start = e.touches[0].pageX;
-	// 	_y_start = e.touches[0].pageY;
-	// 	if (touches.length == 1) {
-	// 		console.log("start", _x_start)
-	// 		left_start = $("#imgInt").css("left");
-	// 		top_start = $("#imgInt").css("top");
-	// 	} else if (touches.length >= 2) {
-	// 		var img = $('#showImg').attr("src");
-	// 		if (img) {
-	// 			$('#imgInt').each(function () {
-	// 				console.log('哈哈哈')
-	// 				new RTP.PinchZoom($(this), {});
-	// 			});
-	// 		}
-	// 	}
-
-	// });
-
-	// document.addEventListener("touchmove", function (e) {
-	// 	var touches = e.touches;
-	// 	_x_move = e.touches[0].pageX;
-	// 	_y_move = e.touches[0].pageY;
-	// 	// console.log("move",_x_move)
-	// 	if (touches.length == 1) {
-	// 		$("#imgInt").css("left", parseFloat(_x_move) - parseFloat(_x_start) + parseFloat(
-	// 			left_start) + "px");
-	// 		$("#imgInt").css("top", parseFloat(_y_move) - parseFloat(_y_start) + parseFloat(
-	// 			top_start) + "px");
-	// 		console.log(parseFloat(_y_move) - parseFloat(_y_start) + parseFloat(top_start));
-	// 	} else if (touches.length >= 2) {
-	// 		var img = $('#showImg').attr("src");
-	// 		if (img) {
-	// 			$('#imgInt').each(function () {
-	// 				console.log('哈哈哈')
-	// 				new RTP.PinchZoom($(this), {});
-	// 			});
-	// 		}
-	// 	}
-
-	// })
 
 	//阻止浏览器下拉事件
-	// $('body').on('touchmove', function (event) {
-	// 	event.preventDefault();
-	// });
+	$('body').on('touchmove', function (event) {
+		event.preventDefault();
+	});
 
 
 
-	// $("#file").change(async () => {
-	// 	let url = await getBase64($("#file")[0].files[0]);
-	// 	let showImg = document.getElementById('showImg');
-	// 	let domImg = document.getElementById('imgInt');
-	// 	domImg.style.top = 0 + "px";
-	// 	domImg.style.left = 0 + "px";
-	// 	showImg.src = url;
-	// 	$('#intfooter').hide();
-	// 	$('#intfooterUp').show();
+	$("#file").change(async () => {
+		let url = await getBase64($("#file")[0].files[0]);
+		let showImg = document.getElementById('showImg');
+		showImg.src = url;
+		$('#intfooter').hide();
+		$('#intfooterUp').show();
 
-	// });
+	});
+	// 转换
+	function getBase64(file) {
+		return new Promise((resolve, reject) => {
+			const reader = new FileReader()
+			reader.readAsDataURL(file)
+			reader.onload = () => resolve(reader.result)
+			reader.onerror = error => reject(error)
+		})
+	}
+	// 返回
+	$('#backImg').on('click', function () {
+		let showImg = document.getElementById('showImg');
+		showImg.src = '';
+		$('#intfooter').show();
+		$('#intfooterUp').hide();
+	})
+	// 上传
+	$('#upfileButton').on('click', function () {
+		console.log('-----------------------');
+		$('#intfooter').hide();
+		$('#intfooterUp').hide();
+		saveAsImg();
+	})
 
-	// function getBase64(file) {
-	// 	return new Promise((resolve, reject) => {
-	// 		const reader = new FileReader()
-	// 		reader.readAsDataURL(file)
-	// 		reader.onload = () => resolve(reader.result)
-	// 		reader.onerror = error => reject(error)
-	// 	})
-	// }
-	// $('#backImg').on('click', function () {
-	// 	let showImg = document.getElementById('showImg');
-	// 	showImg.src = '';
-	// 	$('#intfooter').show();
-	// 	$('#intfooterUp').hide();
-	// })
-	// $('#upfileButton').on('click', function () {
-	// 	console.log('-----------------------');
-	// 	$('#intfooter').hide();
-	// 	$('#intfooterUp').hide();
-	// 	saveAsImg();
-	// })
 
-	// function saveAsImg() {
-	// 	// 先获取你要转换为img的dom节点    
-	// 	var node = document.getElementById('app');
-	// 	html2canvas(node, {
-	// 		onrendered: function (canvas) {
-	// 			var img = new Image();
-	// 			img.src = canvas.toDataURL();
-	// 			var formData = new FormData;
-	// 			formData.append("imgFile", img.src)
-	// 			formData.append("uploadType", 'imgFile');
-	// 			$.ajax({
-	// 				url: './upload.php',
-	// 				type: "post",
-	// 				data: formData,
-	// 				processData: false,
-	// 				contentType: false,
-	// 				dataType: "json",
-	// 				success: function (data) {
-	// 					console.log(data)
-	// 					if (data.result == 1) {
-	// 						console.log(data.imgPath)
-	// 					}
-	// 				}
-	// 			})
-	// 		},
-	// 	});
-	// }
+	// 生成图片
+	function saveAsImg() {
+		// 先获取你要转换为img的dom节点    
+		var node = document.getElementById('app');
+		html2canvas(node, {
+			onrendered: function (canvas) {
+				var img = new Image();
+				img.src = canvas.toDataURL();
+				var formData = new FormData;
+				formData.append("imgFile", img.src)
+				formData.append("uploadType", 'imgFile');
+				$.ajax({
+					url: './upload.php',
+					type: "post",
+					data: formData,
+					processData: false,
+					contentType: false,
+					dataType: "json",
+					success: function (data) {
+						console.log(data)
+						if (data.result == 1) {
+							console.log(data.imgPath)
+						}
+					}
+				})
+			},
+		});
+	}
 	// })
 </script>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0" />
+	<link type="text/css" href="./style/css/reset.css" rel="stylesheet" media="all">
+	<link type="text/css" rel="stylesheet" href="style/css/index.css" media="all"/>
+	<script type="text/javascript" src="./style/js/flexible.js"></script>
+
+	<title></title>
+	<style>
+
+	</style>
+</head>
+<body style="background-color: #82b83e;max-width: 1920px;">
+<div class="barrage">
+	<!-- 头部 -->
+	<div class="barrage-top">
+		<img src="./style/img/dag01.jpg" alt="">
+	</div>
+	<!-- 中部 -->
+	<div class="screen">
+
+		<div class="mid-img">
+			<img src="./style/img/dag02.jpg" alt="">
+			<img src="./style/img/dag03.jpg" alt="">
+			<img src="./style/img/dag04.jpg" alt="">
+			<img src="./style/img/dag05.jpg" alt="">
+			<img src="./style/img/dag06.jpg" alt="">
+		</div>
+		<div class="send">
+			<!-- <div class="input clearfix">
+            <input type="text" class="text">
+            <div class="btn">发送弹幕</div>
+            </div> -->
+		</div>
+		<div class="s_show">
+			<div class="magictime twisterInUp">
+				<span class="raicon"><img src="./style/img/t4.png" alt=""></span>
+					 欢迎使用弹幕
+			</div>
+			<div class="magictime twisterInUp"><span class="raicon"><img src="./style/img/t4.png" alt=""></span>扶我起来，这串代码还没封装</div>
+			<div class="magictime twisterInUp"><span class="raicon"><img src="./style/img/t4.png" alt=""></span>3点了，总算下班了，呵呵呵````</div>
+			<div class="magictime twisterInUp"><span class="raicon"><img src="./style/img/t4.png" alt=""></span>欢迎使用彩色弹幕</div>
+			<div class="magictime twisterInUp"><span class="raicon"><img src="./style/img/t4.png" alt=""></span>扶我起来，这串代码还没封装</div>
+			<div class="magictime twisterInUp"><span class="raicon"><img src="./style/img/t4.png" alt=""></span>3点了，总算下班了，呵呵呵````</div>
+		</div>
+	</div>
+	<!-- 底部 -->
+	<div class="footer">
+		<img src="./style/img/dag07.jpg" alt="">
+		<div class="footer-cen">
+			<div class="footer-b">
+				<span>2021-09-30</span>
+				<span>累计互动人数：2024人</span>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	//模块化 每个功能函数去做自己相应的事情 代码可维护性 可扩展性
+	//初始化函数
+	var aShowList = document.querySelectorAll('.s_show div');//获取元素 H5
+	var oShow = document.querySelector('.s_show');
+	var oSend = document.querySelector('.send');
+	// var oBtn = document.querySelector('.btn');
+	var oText = document.querySelector('.text');
+	var time = 0;//上一次你发送的时间
+	var time1 = 0;
+
+	for(var i = 0;i < aShowList.length;i++){
+		init(aShowList[i]);//执行初始化函数
+	}
+
+	function init(obj){//接受弹幕对象
+		//确定top值的随机区间
+		var screenHeight = document.documentElement.clientHeight;//获取屏幕可视高度
+		var maxTop = screenHeight - oSend.offsetHeight - obj.offsetHeight - 100;//高度差范围
+		obj.style.top = maxTop * Math.random() + 'px';
+		//控制left值
+		var screenWidth = document.documentElement.clientWidth;//获取可视宽度
+		var maxLeft = screenWidth - obj.offsetWidth/* - Math.random() * 800 */;//随机宽度差
+		obj.style.left = maxLeft + 'px';
+		//弹幕的随机颜色
+		obj.style.color = randomColor();
+		/*setInterval(function(){
+            move(obj,maxLeft);
+        },1000);*///普通定时器
+		move(Math.random()*1+1,obj,maxLeft);
+		console.log(Math.random()*1+0.5);
+	}
+	//弹幕移动函数
+	function move(k,obj,maxLeft){
+		var speed = k;//控制速度的变量
+		maxLeft -= speed;//往左移动
+		if(maxLeft > -obj.offsetWidth){
+			obj.style.left = maxLeft + 'px';
+			requestAnimationFrame(function(){
+				move(k,obj,maxLeft);
+			});//H5新增的动画函数
+		}else{
+			init(obj);//重新初始化 营造循环弹幕效果
+			/*  oShow.removeChild(obj);//DOM删除子节点 */
+		}
+	}
+	//随机颜色函数
+	function randomColor(){
+		return '#' + Math.random().toString(16).slice(-6);//一行简化版截取后六位
+		/*var str = '#';
+        for(var i = 0;i < 6;i++){
+            str += Math.floor(Math.random() * 16).toString(16);
+        }
+        return str;*///普通逻辑版
+	}
+
+</script>
+</body>
+</html>

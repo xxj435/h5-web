@@ -46,7 +46,7 @@
 		</div>
 		<div class="int-img" id='imgInt'>
 			<!-- 一开始的定位 -->
-			<img id='showImg' src="" alt="" style="position: absolute;left: 0px; top: -260px;">
+			<img id='showImg' src="" alt="">
 		</div>
 		<div class="intfooter" id="intfooter">
 			<div class="intfooter-b">
@@ -67,7 +67,7 @@
 
 </html>
 <script src="./js/jquery.min.js"></script>
-<script src="./js/canvas-toBlob.js"></script>
+<script src="./js/html2canvas.js"></script>
 <script src="./js/hammer.min.js"></script>
 
 <script>
@@ -76,10 +76,15 @@
 			window.setTimeout(callback, 1000 / 60);
 		};
 	})();
-
+	$(function () {
+		$('#intfooter').show();
+		$('#intfooterUp').hide();
+	})
 	var el = document.querySelector("#showImg");
-	var START_X = Math.round((window.innerWidth - el.offsetWidth) / 2);
-	var START_Y = Math.round((window.innerHeight - el.offsetHeight) / 2);
+	// var START_X = Math.round((window.innerWidth - el.offsetWidth) / 2) ;
+	// var START_Y = Math.round((window.innerHeight - el.offsetHeight) / 2);
+	var START_X = 0;
+	var START_Y = 0;
 	console.log(START_X, START_Y)
 	var ticking = false;
 	var transform; //图像效果
@@ -175,8 +180,10 @@
 
 
 	function updateElementTransform() {
+
 		var value = [
-			'translate3d(' + transform.translate.x + 'px, ' + transform.translate.y + 'px, 0)',
+			'translate3d(' + transform.translate.x + 'px, ' + transform.translate.y +
+			'px, 0)',
 			'scale(' + transform.scale + ', ' + transform.scale + ')',
 			'rotate3d(' + transform.rx + ',' + transform.ry + ',' + transform.rz + ',' + transform.angle +
 			'deg)'
@@ -186,6 +193,7 @@
 		el.style.webkitTransform = value; /*为Chrome/Safari*/
 		el.style.mozTransform = value; /*为Firefox*/
 		el.style.transform = value; /*IE Opera?*/
+
 		ticking = false;
 	}
 
@@ -229,10 +237,14 @@
 
 
 
-	$("#file").change(async () => {
+	$("#file").change(async (e) => {
+		console.log(e);
 		let url = await getBase64($("#file")[0].files[0]);
 		let showImg = document.getElementById('showImg');
 		showImg.src = url;
+		// const file = e.currentTarget.files[0];
+		// const imgURL = window.URL.createObjectURL(file);
+		// showImg.src = imgURL;
 		$('#intfooter').hide();
 		$('#intfooterUp').show();
 
@@ -261,34 +273,93 @@
 		saveAsImg();
 	})
 
+	function dataURLToBlob(dataurl) {
+		let arr = dataurl.split(',');
+		let mime = arr[0].match(/:(.*?);/)[1];
+		let bstr = atob(arr[1]);
+		let n = bstr.length;
+		let u8arr = new Uint8Array(n);
+		while (n--) {
+			u8arr[n] = bstr.charCodeAt(n);
+		}
+		return new Blob([u8arr], {
+			type: mime
+		});
+	}
 
 	// 生成图片
 	function saveAsImg() {
 		// 先获取你要转换为img的dom节点    
 		var node = document.getElementById('app');
+		// html2canvas(node, {
+		// 	onrendered: function (canvas) {
+		// 		var img = new Image();
+		// 		img.src = canvas.toDataURL();
+		// 		console.log(111);
+		// 		console.log(canvas);
+		// 		var formData = new FormData;
+		// 		formData.append("imgFile", img.src)
+		// 		formData.append("uploadType", 'imgFile');
+		// 		$.ajax({
+		// 			url: './upload.php',
+		// 			type: "post",
+		// 			data: formData,
+		// 			processData: false,
+		// 			contentType: false,
+		// 			dataType: "json",
+		// 			success: function (data) {
+		// 				console.log(data)
+		// 				if (data.result == 1) {
+		// 					console.log(data.imgPath)
+		// 				}
+		// 			}
+		// 		})
+		// 	},
+		// });
+		var width = node.clientWidth; //dom宽
+		var height = node.clientHeight; //dom高
+		var scale = 2; //放大倍数
 		html2canvas(node, {
-			onrendered: function (canvas) {
-				var img = new Image();
-				img.src = canvas.toDataURL();
-				var formData = new FormData;
-				formData.append("imgFile", img.src)
-				formData.append("uploadType", 'imgFile');
-				$.ajax({
-					url: './upload.php',
-					type: "post",
-					data: formData,
-					processData: false,
-					contentType: false,
-					dataType: "json",
-					success: function (data) {
-						console.log(data)
-						if (data.result == 1) {
-							console.log(data.imgPath)
-						}
+			dpi: window.devicePixelRatio * 2,
+			scale: scale,
+			width: width,
+			heigth: height,
+		}).then((canvas) => {
+			console.log(canvas.toDataURL());
+			// toDataURL()
+			// let a = document.createElement('a');
+			// let dom = document.body.appendChild(canvas);
+			// dom.style.display = 'none';
+			// a.style.display = 'none';
+			// document.body.removeChild(dom);
+			// let blob = dataURLToBlob(dom.toDataURL('image/png'));
+			// console.log(blob);
+			// a.setAttribute('href', URL.createObjectURL(blob));
+
+			var formData = new FormData;
+			formData.append("imgFile", canvas.toDataURL())
+			formData.append("uploadType", 'imgFile');
+			$.ajax({
+				url: './upload.php',
+				type: "post",
+				data: formData,
+				processData: false,
+				contentType: false,
+				dataType: "json",
+				success: function (data) {
+					console.log(data)
+					if (data.result == 1) {
+						console.log(data.imgPath)
 					}
-				})
-			},
-		});
+				}
+			})
+			//这块是保存图片操作 可以设置保存的图片的信息
+			// a.setAttribute('download', 'lalal' + '.png');
+			// document.body.appendChild(a);
+			// a.click();
+			// URL.revokeObjectURL(blob);
+			// document.body.removeChild(a);
+		})
 	}
 	// })
 </script>
